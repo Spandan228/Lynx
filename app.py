@@ -333,6 +333,7 @@ async def get_stats() -> StatsResponse:
 @app.post("/upload", response_model=UploadResponse, tags=["Ingestion"])
 async def upload_document(
     file: UploadFile = File(...),
+    tenant_id: Optional[str] = Form(None),
     allowed_roles: Optional[str] = Form(None),
     user: UserSecurityContext = Depends(get_current_user_security_context),
 ) -> UploadResponse:
@@ -367,17 +368,18 @@ async def upload_document(
                     )
                 buffer.write(chunk)
 
+        effective_tenant = tenant_id or user.tenant_id
         roles_list = [r.strip() for r in allowed_roles.split(",")] if allowed_roles else user.roles
         logger.info(
             f"Received upload: '{file.filename}' ({total_bytes} bytes) "
-            f"for tenant '{user.tenant_id}', roles: {roles_list}. Ingesting..."
+            f"for tenant '{effective_tenant}', roles: {roles_list}. Ingesting..."
         )
 
         pipeline = service_state.ingestion_pipeline or IngestionPipeline()
         stats = await run_in_threadpool(
             pipeline.process_file,
             destination_path,
-            tenant_id=user.tenant_id,
+            tenant_id=effective_tenant,
             owner_id=user.user_id,
             allowed_roles=roles_list,
         )

@@ -230,7 +230,8 @@ class ModelRouter:
     def grade_document(self, question: str, document_text: str) -> GradeDocuments:
         """Evaluates document relevance using the SLM evaluator with regex and heuristic safety."""
         prompt = f"""You are a strict, ultra-fast Corrective RAG document relevance grader.
-Evaluate if the document chunk contains facts, definitions, or semantic context to help answer the user question.
+Evaluate whether the document chunk contains facts, definitions, or direct context to answer the user question.
+If the document is on an unrelated topic (e.g., quantum computing vs space telescopes or medical biology vs financial tax), you MUST return binary_score "no".
 
 CRITICAL: Return ONLY a valid JSON object matching:
 {{"binary_score": "yes" | "no", "reasoning": "<concise rationale>"}}
@@ -418,18 +419,36 @@ ANSWER:"""
         return [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
 
     def _semantic_fallback_grade(self, question: str, document_text: str) -> GradeDocuments:
-        """Deterministic keyword-overlap grading fallback."""
-        q_words = set(re.findall(r"\w{3,}", question.lower()))
+        """Deterministic keyword-overlap grading fallback with stopword filtering."""
+        stopwords = {
+            "what", "when", "where", "which", "who", "whom", "this", "that", "these", "those",
+            "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had",
+            "having", "do", "does", "did", "doing", "would", "should", "could", "ought",
+            "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at",
+            "by", "for", "with", "about", "against", "between", "into", "through", "during",
+            "before", "after", "above", "below", "to", "from", "up", "down", "in", "out",
+            "on", "off", "over", "under", "again", "further", "then", "once", "here", "there",
+            "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no",
+            "nor", "not", "only", "own", "same", "so", "than", "too", "very", "can", "will",
+            "just", "don", "should", "now", "latest", "recent", "major", "explain", "detail"
+        }
+        q_words = set([w for w in re.findall(r"\w{3,}", question.lower()) if w not in stopwords])
         doc_words = set(re.findall(r"\w{3,}", document_text.lower()))
+        
+        if not q_words:
+            return GradeDocuments(binary_score="no", reasoning="No informative query terms.")
+            
         overlap = q_words.intersection(doc_words)
-        if len(overlap) >= 1:
+        overlap_ratio = len(overlap) / len(q_words)
+        
+        if overlap_ratio >= 0.25 and len(overlap) >= 1:
             return GradeDocuments(
                 binary_score="yes",
                 reasoning=f"Document contains direct contextual match for key query terms ({', '.join(list(overlap)[:4])})."
             )
         return GradeDocuments(
             binary_score="no",
-            reasoning=f"Document lacks relevant context for query terms. Matched 0/{len(q_words)} terms."
+            reasoning=f"Document lacks relevant context for query terms. Matched {len(overlap)}/{len(q_words)} informative terms."
         )
 
     def _semantic_fallback_hallucination(self, generation: str, documents: List[Dict[str, Any]]) -> GradeHallucinations:

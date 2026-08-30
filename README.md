@@ -126,8 +126,8 @@ g:/project/
 ### Step 1: Clone & Install Dependencies
 
 ```bash
-git clone https://github.com/your-org/lynx-crag.git
-cd lynx-crag
+git clone https://github.com/Spandan228/Lynx.git
+cd Lynx
 
 # Create and activate virtual environment
 python -m venv venv

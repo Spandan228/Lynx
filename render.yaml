@@ -1,0 +1,48 @@
+# ==============================================================================
+# Render Blueprint Specification for Lynx CRAG Platform
+# https://render.com/docs/blueprint-spec
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Lynx CRAG Full-Stack Web Service (FastAPI + Modern Web UI)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: lynx-crag
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python ingest.py"
+    startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    autoDeploy: true
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+
+      # Model Router Configuration (Default to high-speed Groq API for cloud deployment)
+      - key: SYNTHESIZER_PROVIDER
+        value: groq
+      - key: SYNTHESIZER_MODEL
+        value: llama-3.3-70b-versatile
+      - key: EVALUATOR_PROVIDER
+        value: groq
+      - key: EVALUATOR_MODEL
+        value: llama-3.1-8b-instant
+
+      # User-supplied API keys (Input in Render Dashboard)
+      - key: GROQ_API_KEY
+        sync: false
+
+      # Multi-Tenant JWT Security
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+
+      # Qdrant Vector Engine Configuration (Local FastEmbed 384d embedded storage)
+      - key: QDRANT_STORAGE_PATH
+        value: ./qdrant_storage
+      - key: QDRANT_COLLECTION_NAME
+        value: agentic_rag_knowledge

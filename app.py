@@ -233,7 +233,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Enable Cross-Origin Resource Sharing (CORS) for UI integration
+# Enable Cross-Origin Resource Sharing (CORS) for UI & API integration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -241,6 +241,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Mount static web frontend assets if available
+STATIC_DIR = Path("./static")
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
+
+@app.get("/", include_in_schema=False)
+async def serve_root():
+    """Serves the Lynx CRAG frontend workspace."""
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    return {"message": "Lynx CRAG API is operational. Visit /docs for Swagger specifications."}
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,103 @@
+services:
+  # =========================================================================
+  # 1. FastAPI Backend Service (Agentic CRAG State Machine + Vector DB)
+  # =========================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: crag_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+      - HOST=0.0.0.0
+      - QDRANT_STORAGE_PATH=/app/qdrant_storage
+      - QDRANT_COLLECTION_NAME=agentic_rag_knowledge
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3:latest
+      - WEB_SEARCH_ENABLED=true
+      - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006/v1/traces
+      - PHOENIX_PROJECT_NAME=agentic-crag-production
+      - PHOENIX_UI_URL=http://localhost:6006
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./qdrant_storage:/app/qdrant_storage
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2048M
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+
+  # =========================================================================
+  # 2. Streamlit Frontend Service (Chat UI + SSE Streaming Visualizer)
+  # =========================================================================
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: crag_frontend
+    restart: unless-stopped
+    command: ["streamlit", "run", "ui.py", "--server.port=8501", "--server.address=0.0.0.0", "--browser.gatherUsageStats=false"]
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - API_URL=http://backend:8000
+      - PHOENIX_UI_URL=http://localhost:6006
+    depends_on:
+      backend:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+
+  # =========================================================================
+  # 3. Arize Phoenix Observability Service (OpenTelemetry LLM Tracing & UI)
+  # =========================================================================
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: crag_phoenix
+    restart: unless-stopped
+    ports:
+      - "6006:6006"
+    environment:
+      - PHOENIX_PORT=6006
+      - PHOENIX_HOST=0.0.0.0
+    volumes:
+      - ./phoenix_data:/root/.phoenix
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1536M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+
+networks:
+  default:
+    name: crag_network
+    driver: bridge

@@ -1,0 +1,66 @@
+name: Lynx CRAG CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    name: Lint & Automated Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8
+
+      - name: Code Quality & Syntax Check (Flake8)
+        run: |
+          # Stop build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv,.venv,__pycache__
+
+      - name: Run Multi-Tenant & CRAG Test Suite
+        env:
+          QDRANT_STORAGE_PATH: "./qdrant_ci_db"
+          QDRANT_COLLECTION_NAME: "agentic_rag_knowledge"
+          JWT_SECRET_KEY: "ci_test_secret_key_2026"
+          JWT_ALGORITHM: "HS256"
+          EVALUATOR_MODEL: "llama3.2:3b"
+          EVALUATOR_PROVIDER: "mock"
+          SYNTHESIZER_MODEL: "llama3"
+          SYNTHESIZER_PROVIDER: "mock"
+        run: |
+          pytest test_pipeline.py test_multi_tenant_security.py test_web_fallback.py -v
+
+  docker-build:
+    name: Docker Container Build Verification
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: lynx-crag:latest

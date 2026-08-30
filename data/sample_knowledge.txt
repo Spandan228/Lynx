@@ -1,0 +1,5 @@
+# Local Agentic RAG Overview
+Local Agentic RAG architectures combine autonomous agent reasoning with retrieval-augmented generation.
+By executing retrieval locally, organizations maintain data privacy and eliminate API latency.
+Key components include high-performance vector databases like Qdrant and lightweight embedding models.
+FastEmbed provides ONNX Runtime execution for lightning-fast embedding generation on standard CPU hardware.

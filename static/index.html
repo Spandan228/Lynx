@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lynx CRAG • Enterprise Agentic Intelligence & Telemetry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Full-Width Workspace Layout -->
+  <div class="app-layout" id="app-layout">
+
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar" id="main-sidebar">
+      <div class="sidebar-header">
+        <div class="logo" onclick="switchView('dashboard')" style="cursor:pointer;" title="Lynx CRAG Home">
+          <svg class="logo-icon" width="30" height="30" viewBox="0 0 32 32" fill="none">
+            <path d="M16 2L3 8V15C3 23.3 8.6 30.1 16 32C23.4 30.1 29 23.3 29 15V8L16 2Z" fill="url(#lynx-grad-bg)" />
+            <path d="M16 6L6 10.5V15C6 21.5 10.3 27 16 28.5C21.7 27 26 21.5 26 15V10.5L16 6Z" fill="url(#lynx-grad)" />
+            <path d="M12 16L15 19L20 13" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="lynx-grad-bg" x1="3" y1="2" x2="29" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#312E81" />
+                <stop offset="1" stop-color="#1E1B4B" />
+              </linearGradient>
+              <linearGradient id="lynx-grad" x1="6" y1="6" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366F1" />
+                <stop offset="1" stop-color="#8B5CF6" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="brand-text-col">
+            <span class="logo-text">Lynx CRAG</span>
+            <span class="logo-subtext">Agentic Intelligence</span>
+          </div>
+        </div>
+        <button class="collapse-btn" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar [Ctrl+B]">
+          <svg class="collapse-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="section-title">CORE AGENT WORKSPACE</div>
+          <button class="nav-item active" id="nav-dashboard" onclick="setActiveNav(this, 'dashboard')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            <span>Telemetry Dashboard</span>
+          </button>
+          <button class="nav-item" id="nav-copilot" onclick="toggleCopilot(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Lynx CRAG Copilot</span>
+            <span class="nav-badge live">LIVE</span>
+          </button>
+          <button class="nav-item" id="nav-knowledge" onclick="openIngestModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Knowledge Base & Docs</span>
+            <span class="nav-badge count" id="sidebar-chunk-count">7</span>
+          </button>
+          <button class="nav-item" id="nav-websearch" onclick="triggerWebSearchDemo()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>Web Fallback Engine</span>
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <div class="section-title">ENGINE & SECURITY</div>
+          <button class="nav-item" id="nav-iam" onclick="openIAMModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Multi-Tenant & RBAC</span>
+          </button>
+          <button class="nav-item" id="nav-models" onclick="openModelRouterInfo()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+            <span>Model Router (SLM/LLM)</span>
+            <span class="nav-badge beta">ROUTED</span>
+          </button>
+          <button class="nav-item" id="nav-evaluation" onclick="openBenchmarkModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Ragas Evaluation</span>
+          </button>
+          <button class="nav-item" id="nav-phoenix" onclick="openPhoenixObservability()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Phoenix Observability ↗</span>
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="team-card" onclick="openIAMModal()" title="Switch Active Tenant Workspace">
+          <div class="team-avatar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+          <div class="team-info">
+            <span class="team-label">Active Workspace</span>
+            <span class="team-name" id="sidebar-active-tenant">tenant_alpha</span>
+          </div>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <button class="upgrade-btn primary-action" onclick="openIngestModal()" title="Upload and parse documents with Docling">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Ingest Document (Docling)</span>
+        </button>
+        
+        <div class="backend-status-row" onclick="fetchDashboardStats()" style="cursor:pointer;" title="Click to refresh connection status">
+          <span class="status-dot online" id="backend-status-indicator"></span>
+          <span class="status-text" id="backend-status-text">Qdrant & LLM Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Dashboard Content -->
+    <main class="main-content" id="main-content">
+      
+      <!-- Top Search and Controls Bar -->
+      <header class="top-bar">
+        <div class="search-box" onclick="focusSearch()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="global-search" placeholder="Search Qdrant vectors, technical docs, or ask a Lynx CRAG query..." onkeydown="handleSearchKey(event)">
+          <span class="search-shortcut" title="Press ⌘+F or Ctrl+K">⌘ + F</span>
+        </div>
+
+        <div class="user-controls">
+          <!-- Dark / Light Theme Toggle -->
+          <button class="tool-icon-btn theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+            <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+
+          <!-- Active Tenant Pill -->
+          <div class="tenant-badge-pill" onclick="openIAMModal()" title="Active Tenant Partition (Click to switch)">
+            <span class="tenant-dot"></span>
+            <span id="top-tenant-name">tenant_alpha</span>
+            <span class="role-subpill" id="top-role-badge">admin</span>
+          </div>
+
+          <!-- Ask AI Button -->
+          <button class="tool-icon-btn" title="Open AI Copilot" onclick="toggleCopilot(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          
+          <!-- Phoenix Observability Button -->
+          <button class="tool-icon-btn notification" title="Launch Phoenix Trace UI (Port 6006)" onclick="openPhoenixObservability()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notif-dot"></span>
+          </button>
+          
+          <!-- Ingest Button -->
+          <button class="tool-icon-btn add-btn" title="Ingest New Document" onclick="openIngestModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </button>
+          
+          <!-- User Profile -->
+          <div class="user-profile" onclick="openIAMModal()" title="Enterprise IAM Context (Click to edit)">
+            <div class="avatar">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="User Avatar">
+            </div>
+            <div class="user-details">
+              <span class="user-name">Young Alaska</span>
+              <span class="user-role" id="user-role-label">Enterprise IAM Admin</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Title & Real-Time Controls -->
+      <div class="dashboard-heading-row">
+        <div>
+          <h1 class="page-title">Lynx CRAG Telemetry & Control</h1>
+          <div class="page-subtitle">Local Qdrant Vector Store • Docling Layout Intelligence • LangGraph Cyclic State Machine</div>
+        </div>
+
+        <div class="header-filters">
+          <button class="filter-pill" onclick="openEngineDetails()" title="View Hybrid Retrieval Architecture">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Qdrant 384d Dense + BM25</span>
+          </button>
+          
+          <button class="filter-pill select" onclick="openModelRouterInfo()" title="View SLM & LLM Routing Tiers">
+            <span>Router: SLM + LLM</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          <button class="action-btn primary-pulse" onclick="toggleCopilot(true)" title="Open Agentic CRAG Query Interface">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Ask Lynx CRAG</span>
+          </button>
+
+          <button class="action-btn" onclick="openIngestModal()" title="Upload and index files with Docling">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Ingest Data</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Top Metric Bento Cards Row (Real-Time RAG Engine Telemetry) -->
+      <div class="kpi-grid">
+        
+        <!-- Card 1: Total Indexed Chunks & Vectors -->
+        <div class="kpi-card" onclick="openIngestModal()" style="cursor:pointer;" title="Click to view & ingest documents">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap indigo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            </div>
+            <span class="kpi-title">Indexed Knowledge Chunks</span>
+            <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <div class="kpi-bottom">
+            <span class="kpi-value" id="kpi-chunks">7</span>
+            <span class="pill-growth positive">
+              <span>100% Vectorized</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 18 6 9 6"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 2: Document Relevance & Retrieval Accuracy -->
+        <div class="kpi-card" onclick="openModelRouterInfo()" style="cursor:pointer;" title="Click to view Evaluator SLM grading specs">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap mint">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <span class="kpi-title">Retrieval Relevancy (CRAG)</span>
+            <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <div class="kpi-bottom">
+            <span class="kpi-value">94.8%</span>
+            <span class="pill-growth positive">
+              <span>+8.2% vs BM25</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 18 6 9 6"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 3: Self-RAG Grounding & Hallucination Defense -->
+        <div class="kpi-card" onclick="openBenchmarkModal()" style="cursor:pointer;" title="Click to view Self-RAG benchmark metrics">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap purple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span class="kpi-title">Self-RAG Grounding Rate</span>
+            <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </div>
+          <div class="kpi-bottom">
+            <span class="kpi-value">98.2%</span>
+            <span class="pill-growth positive">
+              <span>Zero Hallucination</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 18 6 9 6"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Middle Main Cards: CRAG Flow Ribbon Stream & Node Latency Throughput -->
+      <div class="middle-grid">
+        
+        <!-- LangGraph Cyclic CRAG Execution Flow Chart -->
+        <div class="bento-card sales-overview-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              <span class="card-title">LangGraph Cyclic State Machine Execution Flow</span>
+            </div>
+            <div class="card-actions">
+              <button class="mini-btn" onclick="openModelRouterInfo()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> Routing Tiers</button>
+              <button class="mini-btn" onclick="testWorkflowSample()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg> Test Sample</button>
+            </div>
+          </div>
+
+          <div class="sales-metric-row">
+            <span class="large-number">6-Stage Cyclic CRAG</span>
+            <span class="pill-growth positive">Self-Correcting</span>
+            <span class="subtext">Evaluator SLM (3B) + Synthesizer (70B)</span>
+          </div>
+
+          <!-- Flow Visualizer Canvas / SVG Stream Graph -->
+          <div class="flow-chart-container">
+            <svg class="flow-chart-svg" viewBox="0 0 600 240" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="stream-cyan" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.35"/>
+                  <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.4"/>
+                </linearGradient>
+                <linearGradient id="stream-teal" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.35"/>
+                  <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.4"/>
+                </linearGradient>
+                <linearGradient id="stream-blue" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
+                  <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.4"/>
+                </linearGradient>
+                <linearGradient id="stream-purple" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#818cf8" stop-opacity="0.35"/>
+                  <stop offset="50%" stop-color="#818cf8" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#818cf8" stop-opacity="0.4"/>
+                </linearGradient>
+                <linearGradient id="stream-indigo" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#4338ca" stop-opacity="0.35"/>
+                  <stop offset="50%" stop-color="#4338ca" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#4338ca" stop-opacity="0.4"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Connecting Flow Ribbons -->
+              <path d="M 80,68 C 190,68 190,118 300,118 C 410,118 410,38 520,38 L 520,52 C 410,52 410,126 300,126 C 190,126 190,74 80,74 Z" fill="url(#stream-cyan)" />
+              <path d="M 80,78 C 190,78 190,130 300,130 C 410,130 410,58 520,58 L 520,80 C 410,80 410,146 300,146 C 190,146 190,86 80,86 Z" fill="url(#stream-teal)" />
+              <path d="M 80,90 C 190,90 190,150 300,150 C 410,150 410,86 520,86 L 520,118 C 410,118 410,166 300,166 C 190,166 190,120 80,120 Z" fill="url(#stream-blue)" />
+              <path d="M 80,124 C 190,124 190,170 300,170 C 410,170 410,124 520,124 L 520,166 C 410,166 410,192 300,192 C 190,192 190,152 80,152 Z" fill="url(#stream-purple)" />
+              <path d="M 80,156 C 190,156 190,196 300,196 C 410,196 410,172 520,172 L 520,222 C 410,222 410,222 300,222 C 190,222 190,202 80,202 Z" fill="url(#stream-indigo)" />
+            </svg>
+
+            <!-- Stages (1. Retrieve -> 2. Grade/Rewrite -> 3. Synthesize & Ground) -->
+            <div class="flow-column col-oct" onclick="filterByStage('retrieval')" style="cursor:pointer;" title="Stage 1: Hybrid Qdrant + BM25">
+              <div class="column-price">Stage 1: Retrieval</div>
+              <div class="stack-block b-cyan" style="height: 6px;" title="Web hits"></div>
+              <div class="stack-block b-teal" style="height: 8px;" title="BM25 hits"></div>
+              <div class="stack-block b-blue" style="height: 30px;" title="Qdrant dense vectors"></div>
+              <div class="stack-block b-purple" style="height: 28px;" title="Tenant filter"></div>
+              <div class="stack-block b-indigo" style="height: 46px;" title="RBAC mask"></div>
+              <div class="column-label">Dense + BM25</div>
+            </div>
+
+            <div class="flow-column col-nov" onclick="filterByStage('grading')" style="cursor:pointer;" title="Stage 2: SLM Relevance Grader & Rewriter">
+              <div class="column-price">Stage 2: SLM Grade</div>
+              <div class="stack-block b-cyan" style="height: 8px;" title="Web fallback"></div>
+              <div class="stack-block b-teal" style="height: 16px;" title="Rewrite query"></div>
+              <div class="stack-block b-blue" style="height: 16px;" title="Binary yes/no"></div>
+              <div class="stack-block b-purple" style="height: 22px;" title="Context filter"></div>
+              <div class="stack-block b-indigo" style="height: 26px;" title="Relevancy score"></div>
+              <div class="column-label">CRAG Evaluation</div>
+            </div>
+
+            <div class="flow-column col-dec" onclick="filterByStage('grounding')" style="cursor:pointer;" title="Stage 3: High-Capacity Synthesizer & Self-RAG Grounding">
+              <div class="column-price">Stage 3: Grounding</div>
+              <div class="stack-block b-cyan" style="height: 14px;" title="Citations"></div>
+              <div class="stack-block b-teal" style="height: 22px;" title="Fact check"></div>
+              <div class="stack-block b-blue" style="height: 32px;" title="Self-RAG grade"></div>
+              <div class="stack-block b-purple" style="height: 42px;" title="High capacity LLM"></div>
+              <div class="stack-block b-indigo" style="height: 50px;" title="Final Answer"></div>
+              <div class="column-label">Self-RAG Verified</div>
+            </div>
+          </div>
+
+          <!-- Legend Row -->
+          <div class="flow-legend">
+            <span class="legend-item" onclick="filterByStage('retrieval')" style="cursor:pointer;"><span class="dot indigo"></span> Qdrant Vectors</span>
+            <span class="legend-item" onclick="filterByStage('retrieval')" style="cursor:pointer;"><span class="dot purple"></span> BM25 Keywords</span>
+            <span class="legend-item" onclick="filterByStage('grading')" style="cursor:pointer;"><span class="dot blue"></span> SLM Document Grader</span>
+            <span class="legend-item" onclick="triggerWebSearchDemo()" style="cursor:pointer;"><span class="dot teal"></span> DuckDuckGo Fallback</span>
+            <span class="legend-item" onclick="filterByStage('grounding')" style="cursor:pointer;"><span class="dot cyan"></span> Self-RAG Reflection</span>
+          </div>
+        </div>
+
+        <!-- Node Latency & Query Throughput Bar Chart -->
+        <div class="bento-card subscriber-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              <span class="card-title">LangGraph Node Latency (ms)</span>
+            </div>
+            <button class="filter-pill select mini" onclick="openBenchmarkModal()" title="View Benchmark Breakdown">
+              <span>Benchmarks</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+
+          <div class="subscriber-metric-row">
+            <span class="large-number">142 ms</span>
+            <span class="pill-growth positive">Sub-200ms TTFT</span>
+            <span class="subtext">P95 Node Latency</span>
+          </div>
+
+          <!-- Node Latency Chart Component -->
+          <div class="bar-chart-container">
+            <div class="bar-col" onclick="inspectNode('retrieve_node')" title="retrieve_node: 18ms (Click to inspect)">
+              <div class="bar-fill" style="height: 28px;"></div>
+              <span class="bar-day">Retrieve</span>
+            </div>
+            <div class="bar-col" onclick="inspectNode('grade_documents_node')" title="grade_documents_node: 42ms (Click to inspect)">
+              <div class="bar-fill" style="height: 48px;"></div>
+              <span class="bar-day">Grade</span>
+            </div>
+            <div class="bar-col active-highlight" onclick="inspectNode('generate_node')" title="generate_node: 180ms (Click to inspect)">
+              <span class="bar-top-value">180ms</span>
+              <div class="bar-fill active" style="height: 140px;"></div>
+              <span class="bar-day bold">Generate</span>
+            </div>
+            <div class="bar-col" onclick="inspectNode('hallucination_grader_node')" title="hallucination_grader_node: 32ms (Click to inspect)">
+              <div class="bar-fill" style="height: 38px;"></div>
+              <span class="bar-day">Ground</span>
+            </div>
+            <div class="bar-col" onclick="inspectNode('web_search_node')" title="web_search_node: 68ms (Click to inspect)">
+              <div class="bar-fill" style="height: 72px;"></div>
+              <span class="bar-day">Web</span>
+            </div>
+            <div class="bar-col" onclick="inspectNode('rewrite_query_node')" title="rewrite_query_node: 22ms (Click to inspect)">
+              <div class="bar-fill" style="height: 30px;"></div>
+              <span class="bar-day">Rewrite</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Row: Source Modality Distribution & Document Registry Table -->
+      <div class="bottom-grid">
+        
+        <!-- Knowledge Source Distribution Card with Donut Gauge -->
+        <div class="bento-card distribution-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+              <span class="card-title">Context Modality Breakdown</span>
+            </div>
+            <button class="filter-pill select mini" onclick="openIAMModal()" title="Filter by Active Tenant">
+              <span>Active Tenant</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+
+          <div class="distribution-legend-row">
+            <div class="dist-stat" onclick="openIngestModal()" style="cursor:pointer;">
+              <span class="dot-bar purple"></span>
+              <span class="dist-label">Docling PDF / Tables</span>
+              <span class="dist-val">58%</span>
+            </div>
+            <div class="dist-stat" onclick="openIngestModal()" style="cursor:pointer;">
+              <span class="dot-bar teal"></span>
+              <span class="dist-label">Markdown / Text</span>
+              <span class="dist-val">28%</span>
+            </div>
+            <div class="dist-stat" onclick="triggerWebSearchDemo()" style="cursor:pointer;">
+              <span class="dot-bar gray"></span>
+              <span class="dist-label">DuckDuckGo Web</span>
+              <span class="dist-val">14%</span>
+            </div>
+          </div>
+
+          <!-- Gauge Semi-Circle Chart -->
+          <div class="gauge-chart-container" onclick="openEngineDetails()" style="cursor:pointer;" title="Click to view retrieval modality details">
+            <svg class="gauge-svg" viewBox="0 0 240 130">
+              <path d="M 30,120 A 90,90 0 0,1 210,120" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="26" stroke-linecap="round"/>
+              <path d="M 30,120 A 90,90 0 0,1 110,38" fill="none" stroke="url(#donut-purple)" stroke-width="26" stroke-linecap="round"/>
+              <path d="M 120,35 A 90,90 0 0,1 190,75" fill="none" stroke="url(#donut-teal)" stroke-width="26" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="donut-purple" x1="0" y1="1" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#818cf8"/>
+                  <stop offset="100%" stop-color="#6366f1"/>
+                </linearGradient>
+                <linearGradient id="donut-teal" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#2dd4bf"/>
+                  <stop offset="100%" stop-color="#14b8a6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Ingested Documents & Knowledge Registry Table -->
+        <div class="bento-card integration-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span class="card-title">Indexed Knowledge Base (Qdrant)</span>
+            </div>
+            <button class="see-all-link" onclick="openIngestModal()">+ Ingest Document</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="nexus-table">
+              <thead>
+                <tr>
+                  <th style="width: 30px;"><input type="checkbox" checked title="Select All"></th>
+                  <th>DOCUMENT NAME</th>
+                  <th>CHUNKS & TABLES</th>
+                  <th>RBAC ACCESS</th>
+                  <th>SIMILARITY</th>
+                </tr>
+              </thead>
+              <tbody id="knowledge-table-body">
+                <tr onclick="previewDoc('agent_spec.pdf')" style="cursor:pointer;" title="Click to preview agent_spec.pdf">
+                  <td><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+                  <td class="app-cell">
+                    <span class="app-icon pdf">PDF</span>
+                    <span class="app-name">agent_spec.pdf</span>
+                  </td>
+                  <td class="type-cell">Docling (3 Chunks, Table Aware)</td>
+                  <td class="rate-cell">
+                    <span class="rbac-tag admin">admin</span>
+                    <span class="rbac-tag user">finance_reader</span>
+                  </td>
+                  <td class="profit-cell">0.89 (High)</td>
+                </tr>
+
+                <tr onclick="previewDoc('financial_q3_report.md')" style="cursor:pointer;" title="Click to preview financial_q3_report.md">
+                  <td><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+                  <td class="app-cell">
+                    <span class="app-icon md">MD</span>
+                    <span class="app-name">financial_q3_report.md</span>
+                  </td>
+                  <td class="type-cell">2 Chunks (Repeated Headers)</td>
+                  <td class="rate-cell">
+                    <span class="rbac-tag admin">admin</span>
+                    <span class="rbac-tag user">finance_reader</span>
+                  </td>
+                  <td class="profit-cell">0.94 (Exact)</td>
+                </tr>
+
+                <tr onclick="previewDoc('system_architecture.md')" style="cursor:pointer;" title="Click to preview system_architecture.md">
+                  <td><input type="checkbox" checked onclick="event.stopPropagation()"></td>
+                  <td class="app-cell">
+                    <span class="app-icon md">MD</span>
+                    <span class="app-name">system_architecture.md</span>
+                  </td>
+                  <td class="type-cell">2 Chunks (LangGraph Spec)</td>
+                  <td class="rate-cell">
+                    <span class="rbac-tag admin">admin</span>
+                    <span class="rbac-tag user">engineer</span>
+                  </td>
+                  <td class="profit-cell">0.87 (High)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Sliding Agentic CRAG Copilot Drawer -->
+  <div class="copilot-drawer" id="copilot-drawer">
+    <div class="copilot-header">
+      <div class="copilot-title-group">
+        <svg class="ai-spark" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <div>
+          <h3>Lynx CRAG Intelligence Copilot</h3>
+          <span class="copilot-sub">Qdrant Local • Evaluator SLM (3B) • DuckDuckGo Fallback • Self-RAG</span>
+        </div>
+      </div>
+      <button class="drawer-close-btn" onclick="toggleCopilot(false)" title="Close Copilot [Esc]">&times;</button>
+    </div>
+
+    <!-- Copilot Quick Suggestions (Tailored to Project Architecture) -->
+    <div class="quick-prompts-bar">
+      <button class="quick-chip" onclick="submitQuickQuery('How does local Corrective RAG and Self-RAG cyclic routing work?')">📐 Architecture</button>
+      <button class="quick-chip" onclick="submitQuickQuery('What are the Q3 financial revenues and table metrics in the report?')">📊 Q3 Revenue Table</button>
+      <button class="quick-chip" onclick="submitQuickQuery('How does the system enforce multi-tenant vector boundaries and RBAC?')">🛡️ RBAC & Multi-Tenancy</button>
+      <button class="quick-chip" onclick="submitQuickQuery('What are the latest James Webb Space Telescope discoveries in 2026?')">🌐 Live Web Search Fallback</button>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div class="chat-messages" id="chat-messages">
+      <div class="message assistant">
+        <div class="msg-avatar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="msg-body">
+          <div class="msg-content">
+            Hello! I am your <b>Lynx Agentic Corrective RAG (CRAG)</b> assistant.<br><br>
+            I perform <b>Hybrid Vector/BM25 retrieval</b> over your local Qdrant collection, evaluate document relevance via our <b>Evaluator SLM</b>, trigger <b>DuckDuckGo Web Search</b> when context is missing, and verify all claims against hallucinations before answering.<br><br>
+            Ask any technical, financial, or real-time query below to begin!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Chat Input Bar -->
+    <div class="chat-input-wrapper">
+      <div class="chat-input-box">
+        <input type="text" id="chat-input" placeholder="Ask any enterprise technical, financial, or real-time query..." onkeydown="handleChatKeyDown(event)">
+        <button class="send-btn" id="send-btn" onclick="sendChatQuery()" title="Send Query [Enter]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="chat-footer-caption">Powered by Local Qdrant (384d FastEmbed), LangGraph, Docling, and Arize Phoenix Observability.</div>
+    </div>
+  </div>
+
+  <!-- Floating Copilot Launch Bubble -->
+  <button class="copilot-floating-trigger" id="copilot-trigger" onclick="toggleCopilot(true)" title="Open AI Copilot">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </button>
+
+  <!-- Document Ingestion Modal (Docling Table-Aware Ingestion) -->
+  <div class="modal-backdrop" id="ingest-modal" onclick="closeModalOnOutsideClick(event)">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <h3>Docling Document Ingestion</h3>
+        </div>
+        <button class="modal-close" onclick="closeIngestModal()" title="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Upload <code>.pdf</code>, <code>.docx</code>, <code>.md</code>, or <code>.txt</code> files for layout analysis, table-aware chunking with repeated headers, and RBAC vector indexing.</p>
+        
+        <div class="form-group">
+          <label for="modal-tenant">Target Tenant Partition</label>
+          <select id="modal-tenant" class="form-select">
+            <option value="tenant_alpha" selected>tenant_alpha (Alpha Corp)</option>
+            <option value="tenant_beta">tenant_beta (Beta Engineering)</option>
+            <option value="tenant_gamma">tenant_gamma (Gamma Capital)</option>
+            <option value="tenant_default">tenant_default (Public Context)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-roles">Authorized RBAC Roles (comma-separated)</label>
+          <input type="text" id="modal-roles" class="form-input" value="admin,finance_reader,engineer">
+        </div>
+
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="drop-text">Click to browse document or drag & drop</span>
+          <span class="drop-sub">IBM Docling parses complex layouts, multi-column tables & figures</span>
+          <input type="file" id="file-input" style="display:none" onchange="handleFileSelected(event)">
+        </div>
+        <div id="file-chosen-name" class="file-status"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeIngestModal()">Cancel</button>
+        <button class="modal-btn primary" id="upload-btn" onclick="executeDocumentUpload()">Vectorize & Index</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Tenant & RBAC Configuration Modal -->
+  <div class="modal-backdrop" id="iam-modal" onclick="closeIAMModalOnOutsideClick(event)">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <h3>Multi-Tenant IAM & RBAC Security Context</h3>
+        </div>
+        <button class="modal-close" onclick="closeIAMModal()" title="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Switch active tenant workspace and roles to test strict Qdrant vector payload isolation and prevent cross-tenant data leaks.</p>
+        
+        <div class="form-group">
+          <label for="iam-tenant-select">Active Tenant Workspace</label>
+          <select id="iam-tenant-select" class="form-select" onchange="updateActiveTenant(this.value)">
+            <option value="tenant_alpha" selected>tenant_alpha (Alpha Corp)</option>
+            <option value="tenant_beta">tenant_beta (Beta Engineering)</option>
+            <option value="tenant_gamma">tenant_gamma (Gamma Capital)</option>
+            <option value="tenant_default">tenant_default (Public)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="iam-roles-input">User Roles (Filter Authorized Chunks)</label>
+          <input type="text" id="iam-roles-input" class="form-input" value="admin,finance_reader">
+        </div>
+
+        <div class="iam-token-box">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--text-main); margin-bottom:4px;">JWT Access Token Status:</div>
+          <div style="font-size:0.75rem; font-family:monospace; color:#818cf8; word-break:break-all;" id="iam-token-preview">bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... (Active)</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeIAMModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="saveIAMContext()">Apply Context</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arize Phoenix Live Observability & Trace Modal -->
+  <div class="modal-backdrop" id="phoenix-modal" onclick="closePhoenixModalOnOutsideClick(event)">
+    <div class="modal-dialog" style="max-width: 620px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <div>
+            <h3>Arize Phoenix LLM Observability</h3>
+            <span style="font-size:0.72rem; color:var(--text-muted);">OpenTelemetry Tracing • Span Trees • Port 6006</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closePhoenixModal()" title="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(16, 185, 129, 0.12); border:1px solid rgba(16, 185, 129, 0.3); padding:10px 14px; border-radius:10px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="status-dot online"></span>
+            <span style="font-size:0.82rem; font-weight:700; color:#10b981;">Phoenix Collector Active (Port 6006)</span>
+          </div>
+          <a href="http://localhost:6006" target="_blank" rel="noopener noreferrer" class="mini-btn" style="background:#10b981; color:#ffffff; border:none; padding:5px 12px; font-weight:700; text-decoration:none;">Open Web UI ↗</a>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:4px;">
+          <div style="background:var(--bg-subtle); padding:10px 12px; border-radius:10px; border:1px solid var(--border-light);">
+            <div style="font-size:0.7rem; color:var(--text-secondary);">Trace Project</div>
+            <div style="font-size:0.86rem; font-weight:700; color:var(--text-heading); margin-top:2px;">agentic-crag</div>
+          </div>
+          <div style="background:var(--bg-subtle); padding:10px 12px; border-radius:10px; border:1px solid var(--border-light);">
+            <div style="font-size:0.7rem; color:var(--text-secondary);">OTLP Endpoint</div>
+            <div style="font-size:0.86rem; font-weight:700; color:var(--primary-indigo); margin-top:2px;">:6006/v1/traces</div>
+          </div>
+          <div style="background:var(--bg-subtle); padding:10px 12px; border-radius:10px; border:1px solid var(--border-light);">
+            <div style="font-size:0.7rem; color:var(--text-secondary);">Trace Health</div>
+            <div style="font-size:0.86rem; font-weight:700; color:#10b981; margin-top:2px;">100% Captured</div>
+          </div>
+        </div>
+
+        <div style="margin-top:4px;">
+          <div style="font-size:0.78rem; font-weight:700; color:var(--text-heading); margin-bottom:8px;">Live LangGraph Traced Spans:</div>
+          <div style="display:flex; flex-direction:column; gap:6px; font-size:0.78rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-subtle); padding:8px 12px; border-radius:8px; border:1px solid var(--border-light);">
+              <div><b style="color:var(--text-heading);">retrieve_node</b> <span style="color:var(--text-muted);">(Hybrid Dense 384d + BM25)</span></div>
+              <span style="color:#10b981; font-weight:700; font-family:monospace;">18 ms</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-subtle); padding:8px 12px; border-radius:8px; border:1px solid var(--border-light);">
+              <div><b style="color:var(--text-heading);">grade_documents_node</b> <span style="color:var(--text-muted);">(SLM 3B JSON Grading)</span></div>
+              <span style="color:#10b981; font-weight:700; font-family:monospace;">42 ms</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-subtle); padding:8px 12px; border-radius:8px; border:1px solid var(--border-light);">
+              <div><b style="color:var(--text-heading);">generate_node</b> <span style="color:var(--text-muted);">(Synthesizer Stream + Citations)</span></div>
+              <span style="color:var(--primary-indigo); font-weight:700; font-family:monospace;">180 ms</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-subtle); padding:8px 12px; border-radius:8px; border:1px solid var(--border-light);">
+              <div><b style="color:var(--text-heading);">hallucination_grader_node</b> <span style="color:var(--text-muted);">(Self-RAG Reflection)</span></div>
+              <span style="color:#10b981; font-weight:700; font-family:monospace;">32 ms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closePhoenixModal()">Close</button>
+        <a href="http://localhost:6006" target="_blank" rel="noopener noreferrer" class="modal-btn primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+          <span>Launch Phoenix UI (Port 6006)</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- General Info Modal -->
+  <div class="modal-backdrop" id="info-modal" onclick="closeInfoModalOnOutsideClick(event)">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="info-modal-title">Engine Information</h3>
+        <button class="modal-close" onclick="closeInfoModal()" title="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="info-modal-body"></div>
+      <div class="modal-footer">
+        <button class="modal-btn primary" onclick="closeInfoModal()">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

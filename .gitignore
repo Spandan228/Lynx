@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local Vector Storage & Database Persistence
+qdrant_storage/
+qdrant_test_db/
+phoenix_data/
+*.db
+*.sqlite3
+
+# Environment Variables & Local Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Temporary and Media Scratch Files
+scratch/
+*.mp4
+*.avi
+*.mov
+.DS_Store
+Thumbs.db
+.tempmediaStorage/
+
+# IDE & Editor Configurations
+.vscode/
+.idea/
+*.swp
+*.swo

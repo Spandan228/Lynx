@@ -12,7 +12,7 @@ services:
     runtime: python
     region: oregon
     plan: free
-    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && pip install -e . --no-deps"
     startCommand: "uvicorn lynx.app:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /health
     autoDeploy: true
@@ -20,6 +20,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12
+      - key: PYTHONPATH
+        value: src
 
       # Model Router Configuration (Default to high-speed Groq API for cloud deployment)
       - key: SYNTHESIZER_PROVIDER

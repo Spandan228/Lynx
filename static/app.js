@@ -327,8 +327,41 @@ function testWorkflowSample() {
 function openPhoenixObservability(e) {
   if (e) e.preventDefault();
   const modal = document.getElementById("phoenix-modal");
-  if (modal) modal.classList.add("open");
-  showToast("Arize Phoenix Active on Port 6006", "success");
+  if (!modal) return;
+
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const bannerText = document.getElementById("phoenix-status-text");
+  const bannerLink = document.getElementById("phoenix-banner-btn");
+  const mainBtn = document.getElementById("phoenix-main-btn");
+  const cloudInfo = document.getElementById("phoenix-cloud-note");
+
+  if (!isLocal) {
+    if (bannerText) bannerText.innerText = "OpenTelemetry Active (Cloud Mode)";
+    if (bannerLink) {
+      bannerLink.href = "https://app.phoenix.arize.com";
+      bannerLink.innerText = "Phoenix Cloud ↗";
+    }
+    if (mainBtn) {
+      mainBtn.href = "https://app.phoenix.arize.com";
+      mainBtn.innerHTML = `<span>Arize Phoenix Cloud ↗</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+    }
+    if (cloudInfo) cloudInfo.style.display = "block";
+    showToast("OpenTelemetry Tracing Active in Cloud Mode", "info");
+  } else {
+    if (bannerText) bannerText.innerText = "Phoenix Collector Active (Port 6006)";
+    if (bannerLink) {
+      bannerLink.href = "http://localhost:6006";
+      bannerLink.innerText = "Open Web UI ↗";
+    }
+    if (mainBtn) {
+      mainBtn.href = "http://localhost:6006";
+      mainBtn.innerHTML = `<span>Launch Phoenix UI (Port 6006)</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+    }
+    if (cloudInfo) cloudInfo.style.display = "none";
+    showToast("Arize Phoenix Local Collector on Port 6006", "success");
+  }
+
+  modal.classList.add("open");
 }
 
 function closePhoenixModal() {

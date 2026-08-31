@@ -35,6 +35,7 @@ jobs:
 
       - name: Run CI Test Suite (Isolated - No File Lock Conflicts)
         env:
+          PYTHONPATH: "src"
           QDRANT_STORAGE_PATH: "./qdrant_ci_db"
           QDRANT_COLLECTION_NAME: "agentic_rag_knowledge"
           JWT_SECRET_KEY: "ci_test_secret_key_2026"

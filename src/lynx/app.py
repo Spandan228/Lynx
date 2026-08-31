@@ -153,6 +153,11 @@ class StatsResponse(BaseModel):
     supported_formats: List[str]
 
 
+# Set minimal threads for background matrix libs to prevent memory fragmentation in 512MB RAM
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+
 # ---------------------------------------------------------------------------
 # Global Application State & Initializer Helper
 # ---------------------------------------------------------------------------
@@ -162,6 +167,20 @@ class ServiceState:
     ingestion_pipeline: Optional[IngestionPipeline] = None
     hybrid_retriever: Optional[HybridRetriever] = None
     web_search_engine: Optional[WebSearchEngine] = None
+
+    def get_ingestion_pipeline(self) -> IngestionPipeline:
+        """Lazy-loaded IngestionPipeline to prevent startup memory spikes."""
+        if self.ingestion_pipeline is None:
+            ingest_config = IngestionConfig(
+                data_dir=str(DATA_DIR),
+                qdrant_path=QDRANT_PATH,
+                collection_name=COLLECTION_NAME,
+            )
+            self.ingestion_pipeline = IngestionPipeline(
+                config=ingest_config,
+                client=self.qdrant_client,
+            )
+        return self.ingestion_pipeline
 
 
 service_state = ServiceState()
@@ -180,18 +199,7 @@ def initialize_services():
     if service_state.qdrant_client is None:
         service_state.qdrant_client = QdrantClient(path=QDRANT_PATH)
 
-    # 2. Ingestion Pipeline with shared client
-    ingest_config = IngestionConfig(
-        data_dir=str(DATA_DIR),
-        qdrant_path=QDRANT_PATH,
-        collection_name=COLLECTION_NAME,
-    )
-    service_state.ingestion_pipeline = IngestionPipeline(
-        config=ingest_config,
-        client=service_state.qdrant_client,
-    )
-
-    # 3. Hybrid Retriever & Grader with shared client
+    # 2. Hybrid Retriever & Grader with shared client
     service_state.hybrid_retriever = HybridRetriever(
         qdrant_path=QDRANT_PATH,
         collection_name=COLLECTION_NAME,
@@ -200,10 +208,10 @@ def initialize_services():
     document_grader = DocumentGrader()
     service_state.web_search_engine = web_search_client
 
-    # 4. Initialize Observability & Phoenix Telemetry
+    # 3. Initialize Observability & Phoenix Telemetry
     setup_observability()
 
-    # 5. Build & Compile LangGraph State Machine with Web Search Fallback
+    # 4. Build & Compile LangGraph State Machine with Web Search Fallback
     engine = CRAGWorkflowEngine(
         retriever=service_state.hybrid_retriever,
         grader=document_grader,
@@ -375,7 +383,7 @@ async def upload_document(
             f"for tenant '{effective_tenant}', roles: {roles_list}. Ingesting..."
         )
 
-        pipeline = service_state.ingestion_pipeline or IngestionPipeline()
+        pipeline = service_state.get_ingestion_pipeline()
         stats = await run_in_threadpool(
             pipeline.process_file,
             destination_path,

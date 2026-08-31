@@ -176,9 +176,11 @@ class HybridRetriever:
         self.sparse_weight = sparse_weight
         self.rrf_k = rrf_k
 
-        # Initialize dense embedding model
-        logger.info(f"Initializing FastEmbed model: '{embedding_model_name}'...")
-        self.embedding_model = TextEmbedding(model_name=embedding_model_name)
+        logger.info(f"Initializing FastEmbed model: '{embedding_model_name}' (threads=1 for memory efficiency)...")
+        try:
+            self.embedding_model = TextEmbedding(model_name=embedding_model_name, threads=1)
+        except TypeError:
+            self.embedding_model = TextEmbedding(model_name=embedding_model_name)
 
         # Initialize Qdrant Client (reusing existing instance if provided)
         if client is not None:

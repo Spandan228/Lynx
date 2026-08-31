@@ -180,14 +180,21 @@ class DoclingDocumentLoader:
     def __init__(self, supported_extensions: List[str]):
         self.supported_extensions = [ext.lower() for ext in supported_extensions]
         self._docling_converter: Optional[Any] = None
+        self._docling_checked: bool = False
 
-        if DOCLING_AVAILABLE and DocumentConverter is not None:
-            try:
-                self._docling_converter = DocumentConverter()
-                logger.info("Docling DocumentConverter initialized successfully.")
-            except Exception as e:
-                logger.warning(f"Could not initialize Docling DocumentConverter: {e}. Falling back to standard loaders.")
-                self._docling_converter = None
+    @property
+    def converter(self) -> Optional[Any]:
+        """Lazy-loaded Docling DocumentConverter instance to conserve memory at startup."""
+        if not self._docling_checked:
+            self._docling_checked = True
+            if DOCLING_AVAILABLE and DocumentConverter is not None:
+                try:
+                    self._docling_converter = DocumentConverter()
+                    logger.info("Docling DocumentConverter initialized on-demand.")
+                except Exception as e:
+                    logger.warning(f"Could not initialize Docling DocumentConverter: {e}. Falling back to standard loaders.")
+                    self._docling_converter = None
+        return self._docling_converter
 
     @staticmethod
     def compute_sha256(file_path: Path) -> str:
@@ -206,10 +213,11 @@ class DoclingDocumentLoader:
         doc_hash = self.compute_sha256(file_path)
 
         # 1. Primary: Try Docling Document Converter
-        if self._docling_converter is not None and file_path.suffix.lower() in [".pdf", ".docx", ".pptx", ".md", ".txt"]:
+        conv = self.converter
+        if conv is not None and file_path.suffix.lower() in [".pdf", ".docx", ".pptx", ".md", ".txt"]:
             try:
                 logger.info(f"Parsing '{file_path.name}' via Docling layout engine...")
-                conv_res = self._docling_converter.convert(str(file_path))
+                conv_res = conv.convert(str(file_path))
                 doc = conv_res.document
 
                 # Export to clean, table-preserved Markdown

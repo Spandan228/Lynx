@@ -14,7 +14,157 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchDashboardStats();
   setupKeyboardShortcuts();
   setupDropzone();
+  initAnimations();
 });
+
+// --------------------------------------------------------------------------
+// UI Animation Engine — Looping Stagger & Counter System
+// --------------------------------------------------------------------------
+function initAnimations() {
+  animateEntranceStagger();
+  animateBarChartGrowIn();
+  animateFlowRibbons();
+  initKpiCounters();
+  initScrollAnimations();
+}
+
+/**
+ * Stagger-animates all major layout elements on page load using a loop.
+ * Each element gets a progressively delayed kpiFadeUp entrance.
+ */
+function animateEntranceStagger() {
+  const groups = [
+    ".top-bar",
+    ".dashboard-heading-row",
+    ".kpi-card",
+    ".bento-card",
+    ".bar-col",
+  ];
+
+  let delay = 0;
+  const step = 80; // ms between each element
+
+  for (const selector of groups) {
+    const elements = document.querySelectorAll(selector);
+    for (const el of elements) {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(16px)";
+      el.style.transition = `opacity 0.5s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.5s cubic-bezier(0.16,1,0.3,1) ${delay}ms`;
+      // Use rAF to ensure styles are applied before triggering transition
+      setTimeout(() => {
+        el.style.opacity = "";
+        el.style.transform = "";
+      }, 40 + delay);
+      delay += step;
+    }
+  }
+}
+
+/**
+ * Animates bar fills growing upward with staggered delays using a loop.
+ */
+function animateBarChartGrowIn() {
+  const barFills = document.querySelectorAll(".bar-fill");
+  let idx = 0;
+  for (const fill of barFills) {
+    const originalHeight = fill.style.height;
+    fill.style.height = "0px";
+    fill.style.transition = `height 0.7s cubic-bezier(0.16,1,0.3,1) ${idx * 120 + 300}ms`;
+    setTimeout(() => {
+      fill.style.height = originalHeight;
+    }, 60);
+    idx++;
+  }
+}
+
+/**
+ * Applies a looping opacity/transform animation to the SVG ribbon paths
+ * so they appear to flow continuously. Uses a CSS class approach via JS loop.
+ */
+function animateFlowRibbons() {
+  const paths = document.querySelectorAll(".flow-chart-svg path");
+  let idx = 0;
+  for (const path of paths) {
+    path.style.animation = `ribbonShimmer ${2.5 + idx * 0.4}s ease-in-out infinite`;
+    path.style.animationDelay = `${idx * 0.3}s`;
+    idx++;
+  }
+}
+
+/**
+ * Animates KPI value numbers with a rolling count-up effect.
+ * Loops through each .kpi-value element and counts up to its target value.
+ */
+function initKpiCounters() {
+  const kpiValues = document.querySelectorAll(".kpi-value");
+  for (const el of kpiValues) {
+    const raw = el.textContent.trim();
+    // Parse numeric prefix (ignore % suffixes etc.)
+    const numMatch = raw.match(/^([\d,.]+)/);
+    if (!numMatch) continue;
+
+    const suffix = raw.slice(numMatch[0].length);
+    const target = parseFloat(numMatch[1].replace(/,/g, ""));
+    if (isNaN(target)) continue;
+
+    el.style.animation = "numberRoll 0.6s cubic-bezier(0.16,1,0.3,1) both";
+    animateCounter(el, 0, target, suffix, 900);
+  }
+}
+
+/**
+ * Counts from `from` to `to` over `duration` ms, updating el.textContent.
+ * Uses requestAnimationFrame for a smooth looping counter.
+ */
+function animateCounter(el, from, to, suffix, duration) {
+  const startTime = performance.now();
+  const isDecimal = !Number.isInteger(to);
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = from + (to - from) * eased;
+
+    el.textContent = isDecimal
+      ? current.toFixed(1) + suffix
+      : Math.floor(current) + suffix;
+
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = (isDecimal ? to.toFixed(1) : to) + suffix;
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+
+/**
+ * IntersectionObserver loop that re-triggers entrance animations
+ * whenever a card scrolls into the viewport.
+ */
+function initScrollAnimations() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("anim-visible");
+          // Don't unobserve — keep watching for scroll-out/in re-triggers
+        } else {
+          entry.target.classList.remove("anim-visible");
+        }
+      }
+    },
+    { threshold: 0.12 }
+  );
+
+  const targets = document.querySelectorAll(".kpi-card, .bento-card");
+  for (const el of targets) {
+    observer.observe(el);
+  }
+}
 
 // --------------------------------------------------------------------------
 // Toast Notification Utility

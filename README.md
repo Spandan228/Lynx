@@ -75,34 +75,60 @@ flowchart TD
 ## 📁 Repository Structure
 
 ```
-g:/project/
-├── app.py                      # FastAPI REST & SSE Backend with multi-tenant auth & /stream_query
-├── auth.py                     # JWT Bearer authentication & RBAC Security Context provider
-├── graph.py                    # LangGraph Cyclic CRAG & Self-RAG state machine implementation
-├── ingest.py                   # IBM Docling document intelligence & table-aware chunking pipeline
-├── model_router.py             # Heterogeneous model router (Evaluator SLM 3B vs Synthesizer 70B)
-├── retriever.py                # Hybrid Retriever (Qdrant Dense FastEmbed + Sparse BM25 with RRF)
-├── web_search.py               # DuckDuckGo live web fallback search integration
-├── observability.py            # OpenTelemetry & Arize Phoenix tracing instrumentation layer
-├── phoenix_server.py           # Arize Phoenix server daemon (Port 6006)
-├── ui.py                       # Streamlit fullscreen host wrapper with zero-margin injection
-├── static/                     # Modern Dashboard Frontend
-│   ├── index.html              # Full-width workspace, sliding Copilot, modals, and charts
-│   ├── styles.css              # Modern design system (Dark & Light themes, Bento grid)
-│   └── app.js                  # SSE streaming client, theme toggler, and IAM context manager
-├── data/                       # Ingested knowledge documents (PDFs, Markdown reports)
-│   ├── agent_spec.pdf          # Multi-tenant Agentic RAG technical specification
-│   ├── financial_q3_report.md  # Q3 financial revenue report with multi-column tables
-│   └── system_architecture.md  # LangGraph state machine architectural specification
-├── evaluate_rag.py             # Ragas synthetic evaluation benchmark suite
-├── load_test.py                # Asynchronous multi-tenant stress & concurrency testing suite
-├── test_pipeline.py            # End-to-end CRAG state machine test suite
-├── test_multi_tenant_security.py # Multi-tenant vector boundary & RBAC isolation tests
-├── test_observability.py       # Arize Phoenix OpenTelemetry tracing validation tests
-├── test_web_fallback.py        # DuckDuckGo fallback query validation tests
-├── docker-compose.yml          # Multi-container deployment (FastAPI, Streamlit, Phoenix, Qdrant)
-├── Dockerfile                  # Production container definition
-└── requirements.txt            # Project dependencies
+Lynx/
+├── app.py                          # FastAPI REST & SSE Backend — multi-tenant auth, /stream_query, static serving
+├── auth.py                         # JWT Bearer authentication & RBAC Security Context provider
+├── graph.py                        # LangGraph Cyclic CRAG & Self-RAG state machine (6 nodes)
+├── ingest.py                       # IBM Docling document intelligence & table-aware chunking pipeline
+├── model_router.py                 # Heterogeneous model router (Evaluator SLM 3B vs Synthesizer 70B)
+├── retriever.py                    # Hybrid Retriever (Qdrant Dense FastEmbed + Sparse BM25 with RRF)
+├── web_search.py                   # DuckDuckGo live web fallback search integration
+├── observability.py                # OpenTelemetry & Arize Phoenix tracing instrumentation layer
+├── phoenix_server.py               # Arize Phoenix server daemon (Port 6006)
+├── ui.py                           # Legacy Streamlit host wrapper (superseded by static/ frontend)
+│
+├── static/                         # Primary Modern Dashboard Frontend (served by FastAPI)
+│   ├── index.html                  # Full-width workspace — sliding Copilot, modals, bento charts
+│   ├── styles.css                  # Design system — Dark/Light themes, looping animations, Bento grid
+│   └── app.js                      # SSE streaming client, animation engine, theme toggler, IAM manager
+│
+├── data/                           # Ingested knowledge documents (PDFs, Markdown)
+│   ├── agent_spec.pdf              # Multi-tenant Agentic RAG technical specification
+│   ├── financial_q3_report.md      # Q3 financial revenue report with multi-column tables
+│   ├── system_architecture.md      # LangGraph state machine architectural specification
+│   ├── biotech_clinical_trial_q3.pdf    # Biotech domain test document
+│   ├── cybersecurity_zero_trust_audit.pdf # Cybersecurity domain test document
+│   ├── quantum_computing_spec.pdf  # Quantum computing domain test document
+│   └── sample_knowledge.txt        # Baseline plain-text knowledge seed
+│
+├── evaluate_rag.py                 # Ragas synthetic evaluation benchmark suite
+├── load_test.py                    # Asynchronous multi-tenant stress & concurrency testing suite
+├── generate_test_pdfs.py           # Generator for domain-specific benchmark test PDFs
+│
+├── test_ci.py                      # Isolated CI test suite (10/10 passing, no live infra required)
+├── test_pipeline.py                # End-to-end CRAG state machine integration tests
+├── test_pdf_rag_loop.py            # Live multi-PDF RAG loop verification tests
+├── test_multi_tenant_security.py   # Multi-tenant vector boundary & RBAC isolation tests
+├── test_observability.py           # Arize Phoenix OpenTelemetry tracing validation tests
+├── test_web_fallback.py            # DuckDuckGo fallback query validation tests
+│
+├── benchmark_results.csv           # Ragas benchmark raw results (CSV)
+├── benchmark_results.md            # Ragas benchmark human-readable report
+├── load_test_metrics.csv           # Load test raw throughput & latency metrics (CSV)
+├── load_test_report.md             # Load test human-readable performance report
+│
+├── docker-compose.yml              # Multi-container deployment (FastAPI, Phoenix, Qdrant)
+├── Dockerfile                      # Production container definition
+├── render.yaml                     # Render.com one-click cloud deployment blueprint
+├── .env.example                    # Environment variable template (safe to commit)
+├── .dockerignore                   # Docker build exclusions
+├── .gitignore                      # Git exclusions (venv, qdrant_storage, .env, __pycache__)
+├── requirements.txt                # Python project dependencies
+└── README.md                       # This file
+
+└── .github/
+    └── workflows/
+        └── ci.yml                  # GitHub Actions CI/CD pipeline (lint + isolated test suite)
 ```
 
 ---

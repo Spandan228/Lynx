@@ -23,22 +23,22 @@ from fastapi.testclient import TestClient
 from qdrant_client import QdrantClient
 
 # Security & RAG Module Imports
-from auth import (
+from lynx.auth import (
     UserSecurityContext,
     create_access_token,
     decode_access_token,
     JWT_SECRET_KEY,
 )
-from ingest import (
+from lynx.ingest import (
     IngestionPipeline,
     IngestionConfig,
     DocumentChunk,
     QdrantVectorStore,
     LocalEmbeddingEngine,
 )
-from retriever import HybridRetriever, RetrievedChunk
-from graph import create_crag_graph
-from app import app, service_state
+from lynx.retriever import HybridRetriever, RetrievedChunk
+from lynx.graph import create_crag_graph
+from lynx.app import app, service_state
 
 
 def run_multi_tenant_security_tests():
@@ -311,3 +311,4 @@ def run_multi_tenant_security_tests():
 
 if __name__ == "__main__":
     run_multi_tenant_security_tests()
+

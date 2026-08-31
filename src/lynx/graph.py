@@ -40,9 +40,9 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, System
 from langgraph.graph import StateGraph, START, END
 
 # Import verified CRAG hybrid retriever, web search, and heterogeneous model router
-from retriever import HybridRetriever, DocumentGrader, RetrievedChunk
-from web_search import web_search_client, WebSearchEngine
-from model_router import ModelRouter, model_router, GradeDocuments, GradeHallucinations, RewrittenQuery
+from lynx.retriever import HybridRetriever, DocumentGrader, RetrievedChunk
+from lynx.web_search import web_search_client, WebSearchEngine
+from lynx.model_router import ModelRouter, model_router, GradeDocuments, GradeHallucinations, RewrittenQuery
 
 # ---------------------------------------------------------------------------
 # Logging Configuration
@@ -56,8 +56,8 @@ logging.basicConfig(
 logger = logging.getLogger("crag_agent")
 
 
-from auth import UserSecurityContext
-from observability import trace_agent_node, setup_observability
+from lynx.auth import UserSecurityContext
+from lynx.observability import trace_agent_node, setup_observability
 
 # Initialize observability telemetry provider
 setup_observability()
@@ -566,3 +566,4 @@ if __name__ == "__main__":
     for cit in final_state.get("citations", []):
         print(f" - {cit}")
     print("=" * 70 + "\n")
+

@@ -76,59 +76,67 @@ flowchart TD
 
 ```
 Lynx/
-├── app.py                          # FastAPI REST & SSE Backend — multi-tenant auth, /stream_query, static serving
-├── auth.py                         # JWT Bearer authentication & RBAC Security Context provider
-├── graph.py                        # LangGraph Cyclic CRAG & Self-RAG state machine (6 nodes)
-├── ingest.py                       # IBM Docling document intelligence & table-aware chunking pipeline
-├── model_router.py                 # Heterogeneous model router (Evaluator SLM 3B vs Synthesizer 70B)
-├── retriever.py                    # Hybrid Retriever (Qdrant Dense FastEmbed + Sparse BM25 with RRF)
-├── web_search.py                   # DuckDuckGo live web fallback search integration
-├── observability.py                # OpenTelemetry & Arize Phoenix tracing instrumentation layer
-├── phoenix_server.py               # Arize Phoenix server daemon (Port 6006)
-├── ui.py                           # Legacy Streamlit host wrapper (superseded by static/ frontend)
+├── src/
+│   └── lynx/                       # Core application package (importable as lynx.*)
+│       ├── __init__.py
+│       ├── app.py                  # FastAPI REST & SSE Backend — multi-tenant auth, /stream_query
+│       ├── auth.py                 # JWT Bearer authentication & RBAC Security Context provider
+│       ├── graph.py                # LangGraph Cyclic CRAG & Self-RAG state machine (6 nodes)
+│       ├── ingest.py               # IBM Docling document intelligence & table-aware chunking
+│       ├── model_router.py         # Heterogeneous model router (Evaluator SLM 3B vs Synthesizer 70B)
+│       ├── retriever.py            # Hybrid Retriever (Qdrant Dense FastEmbed + Sparse BM25 + RRF)
+│       ├── web_search.py           # DuckDuckGo live web fallback search integration
+│       ├── observability.py        # OpenTelemetry & Arize Phoenix tracing instrumentation
+│       └── phoenix_server.py       # Arize Phoenix server daemon (Port 6006)
 │
 ├── static/                         # Primary Modern Dashboard Frontend (served by FastAPI)
 │   ├── index.html                  # Full-width workspace — sliding Copilot, modals, bento charts
 │   ├── styles.css                  # Design system — Dark/Light themes, looping animations, Bento grid
 │   └── app.js                      # SSE streaming client, animation engine, theme toggler, IAM manager
 │
+├── tests/                          # All test files (pytest)
+│   ├── __init__.py
+│   ├── conftest.py                 # Shared fixtures & sys.path setup for src/ layout
+│   ├── test_ci.py                  # Isolated CI test suite (10/10, no live infra required)
+│   ├── test_pipeline.py            # End-to-end CRAG state machine integration tests
+│   ├── test_pdf_rag_loop.py        # Live multi-PDF RAG loop verification tests
+│   ├── test_multi_tenant_security.py  # Multi-tenant vector boundary & RBAC isolation tests
+│   ├── test_observability.py       # Arize Phoenix OpenTelemetry tracing validation tests
+│   └── test_web_fallback.py        # DuckDuckGo fallback query validation tests
+│
+├── scripts/                        # Utility & benchmarking scripts
+│   ├── evaluate_rag.py             # Ragas synthetic evaluation benchmark suite
+│   ├── load_test.py                # Async multi-tenant stress & concurrency testing suite
+│   └── generate_test_pdfs.py       # Generator for domain-specific benchmark test PDFs
+│
+├── reports/                        # Benchmark & performance reports
+│   ├── benchmark_results.md        # Ragas benchmark human-readable report
+│   └── load_test_report.md         # Load test human-readable performance report
+│
 ├── data/                           # Ingested knowledge documents (PDFs, Markdown)
-│   ├── agent_spec.pdf              # Multi-tenant Agentic RAG technical specification
-│   ├── financial_q3_report.md      # Q3 financial revenue report with multi-column tables
-│   ├── system_architecture.md      # LangGraph state machine architectural specification
-│   ├── biotech_clinical_trial_q3.pdf    # Biotech domain test document
-│   ├── cybersecurity_zero_trust_audit.pdf # Cybersecurity domain test document
-│   ├── quantum_computing_spec.pdf  # Quantum computing domain test document
-│   └── sample_knowledge.txt        # Baseline plain-text knowledge seed
+│   ├── agent_spec.pdf
+│   ├── financial_q3_report.md
+│   ├── system_architecture.md
+│   ├── biotech_clinical_trial_q3.pdf
+│   ├── cybersecurity_zero_trust_audit.pdf
+│   ├── quantum_computing_spec.pdf
+│   └── sample_knowledge.txt
 │
-├── evaluate_rag.py                 # Ragas synthetic evaluation benchmark suite
-├── load_test.py                    # Asynchronous multi-tenant stress & concurrency testing suite
-├── generate_test_pdfs.py           # Generator for domain-specific benchmark test PDFs
+├── .github/
+│   └── workflows/
+│       └── ci.yml                  # GitHub Actions CI/CD pipeline (lint + isolated test suite)
 │
-├── test_ci.py                      # Isolated CI test suite (10/10 passing, no live infra required)
-├── test_pipeline.py                # End-to-end CRAG state machine integration tests
-├── test_pdf_rag_loop.py            # Live multi-PDF RAG loop verification tests
-├── test_multi_tenant_security.py   # Multi-tenant vector boundary & RBAC isolation tests
-├── test_observability.py           # Arize Phoenix OpenTelemetry tracing validation tests
-├── test_web_fallback.py            # DuckDuckGo fallback query validation tests
-│
-├── benchmark_results.csv           # Ragas benchmark raw results (CSV)
-├── benchmark_results.md            # Ragas benchmark human-readable report
-├── load_test_metrics.csv           # Load test raw throughput & latency metrics (CSV)
-├── load_test_report.md             # Load test human-readable performance report
-│
+├── pyproject.toml                  # Modern Python packaging (PEP 517/518, pytest config, ruff)
 ├── docker-compose.yml              # Multi-container deployment (FastAPI, Phoenix, Qdrant)
 ├── Dockerfile                      # Production container definition
 ├── render.yaml                     # Render.com one-click cloud deployment blueprint
 ├── .env.example                    # Environment variable template (safe to commit)
 ├── .dockerignore                   # Docker build exclusions
-├── .gitignore                      # Git exclusions (venv, qdrant_storage, .env, __pycache__)
+├── .gitignore                      # Git exclusions
 ├── requirements.txt                # Python project dependencies
+├── LICENSE                         # MIT License
+├── CONTRIBUTING.md                 # Contribution guide & development workflow
 └── README.md                       # This file
-
-└── .github/
-    └── workflows/
-        └── ci.yml                  # GitHub Actions CI/CD pipeline (lint + isolated test suite)
 ```
 
 ---
@@ -162,8 +170,9 @@ python -m venv venv
 # Linux/macOS:
 source venv/bin/activate
 
-# Install dependencies
+# Install dependencies + package in editable mode (enables `from lynx.X import Y`)
 pip install -r requirements.txt
+pip install -e . --no-deps
 ```
 
 ---
@@ -219,18 +228,15 @@ Output:
 
 #### 1. Start Arize Phoenix Observability (Port 6006)
 ```bash
-python phoenix_server.py
+python src/lynx/phoenix_server.py
 ```
 
-#### 2. Start FastAPI Backend (Port 8000)
+#### 2. Start FastAPI Backend + Dashboard (Port 8000)
 ```bash
-python -m uvicorn app:app --host 0.0.0.0 --port 8000
+uvicorn lynx.app:app --host 0.0.0.0 --port 8000
 ```
 
-#### 3. Start Streamlit Workspace (Port 8501)
-```bash
-python -m streamlit run ui.py --server.port 8501 --server.address 0.0.0.0
-```
+The modern web dashboard is served automatically at **http://localhost:8000**.
 
 ---
 
@@ -238,7 +244,7 @@ python -m streamlit run ui.py --server.port 8501 --server.address 0.0.0.0
 
 | Service | URL | Purpose |
 | :--- | :--- | :--- |
-| **Lynx CRAG Dashboard & Copilot** | **[http://localhost:8501](http://localhost:8501)** | Full-page interactive dashboard with sliding AI Copilot |
+| **Lynx CRAG Dashboard & Copilot** | **[http://localhost:8000](http://localhost:8000)** | Full-page interactive dashboard with sliding AI Copilot |
 | **FastAPI REST API & Docs** | **[http://localhost:8000/docs](http://localhost:8000/docs)** | OpenAPI Swagger documentation |
 | **Arize Phoenix Tracing** | **[http://localhost:6006](http://localhost:6006)** | OpenTelemetry trace tree, span graphs, and latency breakdowns |
 

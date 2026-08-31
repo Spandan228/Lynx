@@ -1,7 +1,0 @@
-query_id,domain,question,expected_fallback,actual_fallback,fallback_correct,context_precision,faithfulness_score,answer_relevance,citations_count,latency_seconds
-ID-001,in_domain,How does local agentic RAG ensure data privacy?,False,False,True,1.0,0.99,1.0,3,4.1
-ID-002,in_domain,What vector database and indexing strategy is utilized for local storage?,False,False,True,1.0,0.954,0.8,2,4.09
-ID-003,in_domain,How does FastEmbed optimize embedding computation on CPU hardware?,False,True,False,1.0,1.0,1.0,4,14.16
-ID-004,in_domain,What mechanism ensures document ingestion idempotency?,False,False,True,1.0,0.905,0.6,2,4.08
-OOD-001,out_of_domain,What is the primary scientific objective of the James Webb Space Telescope?,True,True,True,1.0,1.0,0.6,3,14.42
-OOD-002,out_of_domain,What distance from Earth has Voyager 1 reached in interstellar space?,True,True,True,1.0,1.0,1.0,3,14.34

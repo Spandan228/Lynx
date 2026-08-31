@@ -50,8 +50,8 @@ import httpx
 import numpy as np
 
 # Pipeline and Security Imports
-from auth import UserSecurityContext, create_access_token
-from app import app, service_state, initialize_services
+from lynx.auth import UserSecurityContext, create_access_token
+from lynx.app import app, service_state, initialize_services
 
 # ---------------------------------------------------------------------------
 # Logging Setup
@@ -791,3 +791,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

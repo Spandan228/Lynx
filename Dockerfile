@@ -54,8 +54,10 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /root/.cache /app/.cache
 
-# Copy application source files
-COPY ingest.py retriever.py web_search.py graph.py app.py ui.py test_pipeline.py ./
+# Copy application source files (src/lynx package + static frontend + data)
+COPY src/ ./src/
+COPY static/ ./static/
+COPY requirements.txt pyproject.toml ./
 
 # Create necessary persistent storage directories and assign permissions to non-root appuser
 RUN mkdir -p /app/data /app/qdrant_storage /app/.cache && \
@@ -72,4 +74,4 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Default Command: Start FastAPI Backend Server
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "lynx.app:app", "--host", "0.0.0.0", "--port", "8000"]

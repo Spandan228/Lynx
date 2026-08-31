@@ -32,32 +32,32 @@ from fastapi.testclient import TestClient
 from qdrant_client import QdrantClient
 
 # Modules under test
-from ingest import (
+from lynx.ingest import (
     IngestionConfig,
     IngestionPipeline,
     LocalEmbeddingEngine,
     TableAwareSemanticChunker,
     DoclingDocumentLoader,
 )
-from retriever import (
+from lynx.retriever import (
     HybridRetriever,
     DocumentGrader,
     RetrievedChunk,
     GradedChunk,
 )
-from model_router import (
+from lynx.model_router import (
     ModelRouter,
     model_router,
     GradeDocuments,
     GradeHallucinations,
     RewrittenQuery,
 )
-from graph import (
+from lynx.graph import (
     create_crag_graph,
     CRAGWorkflowEngine,
     AgentState,
 )
-from app import (
+from lynx.app import (
     app,
     QueryRequest,
     QueryResponse,
@@ -535,3 +535,4 @@ if __name__ == "__main__":
     if suite.failed_count > 0:
         sys.exit(1)
     sys.exit(0)
+

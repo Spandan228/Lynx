@@ -33,10 +33,10 @@ from langchain_core.messages import HumanMessage
 from qdrant_client import QdrantClient
 
 # Import modular RAG engine & ingestion components
-from ingest import IngestionPipeline, IngestionConfig
-from retriever import HybridRetriever, DocumentGrader
-from web_search import web_search_client, WebSearchEngine
-from graph import create_crag_graph, CRAGWorkflowEngine, AgentState
+from lynx.ingest import IngestionPipeline, IngestionConfig
+from lynx.retriever import HybridRetriever, DocumentGrader
+from lynx.web_search import web_search_client, WebSearchEngine
+from lynx.graph import create_crag_graph, CRAGWorkflowEngine, AgentState
 
 # ---------------------------------------------------------------------------
 # Logging Setup
@@ -48,7 +48,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 # Security & Multi-Tenant Authentication
-from auth import (
+from lynx.auth import (
     UserSecurityContext,
     get_current_user_security_context,
     create_access_token,
@@ -56,7 +56,7 @@ from auth import (
 )
 
 # OpenTelemetry & Arize Phoenix Observability
-from observability import (
+from lynx.observability import (
     setup_observability,
     get_current_trace_id,
     PHOENIX_UI_URL,
@@ -65,8 +65,8 @@ from observability import (
 
 logger = logging.getLogger("rag_api")
 
-DATA_DIR = Path("./data")
-QDRANT_PATH = "./qdrant_storage"
+DATA_DIR = Path(__file__).parent.parent.parent / "data"
+QDRANT_PATH = str(Path(__file__).parent.parent.parent / "qdrant_storage")
 COLLECTION_NAME = "agentic_rag_knowledge"
 MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB limit
 
@@ -246,7 +246,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 # Mount static web frontend assets if available
-STATIC_DIR = Path("./static")
+STATIC_DIR = Path(__file__).parent.parent.parent / "static"
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
 
@@ -680,7 +680,7 @@ async def stream_query_endpoint(
 # ---------------------------------------------------------------------------
 # Static Web Dashboard Mount (sample.mp4 replica)
 # ---------------------------------------------------------------------------
-static_dir = Path(__file__).parent / "static"
+static_dir = Path(__file__).parent.parent.parent / "static"
 if static_dir.exists():
     from fastapi.staticfiles import StaticFiles
     app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
@@ -689,5 +689,6 @@ if static_dir.exists():
 if __name__ == "__main__":
     import uvicorn
     print("Starting FastAPI Backend Server with Web Search on http://localhost:8000 ...")
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("lynx.app:app", host="0.0.0.0", port=8000, reload=False)
+
 

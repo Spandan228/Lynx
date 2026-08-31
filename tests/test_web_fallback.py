@@ -16,10 +16,10 @@ from qdrant_client import QdrantClient
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
-from retriever import HybridRetriever, DocumentGrader
-from web_search import web_search_client
-from graph import create_crag_graph, CRAGWorkflowEngine, AgentState
-from app import app
+from lynx.retriever import HybridRetriever, DocumentGrader
+from lynx.web_search import web_search_client
+from lynx.graph import create_crag_graph, CRAGWorkflowEngine, AgentState
+from lynx.app import app
 
 # ANSI Colors
 GREEN = "\033[92m"
@@ -121,3 +121,4 @@ def test_fastapi_sse_streaming():
 if __name__ == "__main__":
     test_graph_web_fallback()
     test_fastapi_sse_streaming()
+

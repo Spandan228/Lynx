@@ -45,7 +45,7 @@ from qdrant_client.models import Filter, FieldCondition, MatchValue, MatchAny
 from rank_bm25 import BM25Okapi
 
 # Security & RBAC Context
-from auth import UserSecurityContext
+from lynx.auth import UserSecurityContext
 
 # ---------------------------------------------------------------------------
 # Logging Setup
@@ -433,7 +433,7 @@ class HybridRetriever:
 
 
 # Import ModelRouter and schema definitions
-from model_router import ModelRouter, model_router, GradeDocuments
+from lynx.model_router import ModelRouter, model_router, GradeDocuments
 
 
 # ---------------------------------------------------------------------------
@@ -739,3 +739,4 @@ if __name__ == "__main__":
     assert grade_obj.binary_score == "yes"
 
     print("\n[ALL TESTS PASSED] CRAG Retrieval and Grading Pipeline fully verified.\n")
+

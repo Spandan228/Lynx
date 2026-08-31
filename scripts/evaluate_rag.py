@@ -34,9 +34,9 @@ from langchain_core.messages import HumanMessage
 from qdrant_client import QdrantClient
 
 # System modules
-from retriever import HybridRetriever, DocumentGrader
-from web_search import web_search_client
-from graph import create_crag_graph, CRAGWorkflowEngine, AgentState
+from lynx.retriever import HybridRetriever, DocumentGrader
+from lynx.web_search import web_search_client
+from lynx.graph import create_crag_graph, CRAGWorkflowEngine, AgentState
 
 # ---------------------------------------------------------------------------
 # Logging Configuration
@@ -352,3 +352,4 @@ def run_rag_evaluation():
 
 if __name__ == "__main__":
     run_rag_evaluation()
+

@@ -40,3 +40,21 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Raw benchmark & load test CSV output (markdown reports kept in reports/)
+*.csv
+reports/*.csv
+
+# Python packaging & build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+site/
+
+# Editable install artifacts
+src/*.egg-info/
+
+# CI test database
+qdrant_ci_db/

@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 # ---------------------------------------------------------------------------
 # 1. Auth & Security
 # ---------------------------------------------------------------------------
-from auth import (
+from lynx.auth import (
     UserSecurityContext,
     create_access_token,
     decode_access_token,
@@ -46,7 +46,7 @@ def test_rbac_admin_bypass():
 # ---------------------------------------------------------------------------
 # 2. Retriever Schemas & RRF Logic
 # ---------------------------------------------------------------------------
-from retriever import RetrievedChunk, GradedChunk
+from lynx.retriever import RetrievedChunk, GradedChunk
 
 
 def test_retrieved_chunk_schema():
@@ -88,7 +88,7 @@ def test_reciprocal_rank_fusion():
 # ---------------------------------------------------------------------------
 # 3. Model Router Schemas
 # ---------------------------------------------------------------------------
-from model_router import GradeDocuments, GradeHallucinations, RewrittenQuery
+from lynx.model_router import GradeDocuments, GradeHallucinations, RewrittenQuery
 
 
 def test_model_router_schemas():
@@ -108,7 +108,7 @@ def test_model_router_schemas():
 # ---------------------------------------------------------------------------
 # 4. LangGraph Compilation (mocked Qdrant to avoid file lock)
 # ---------------------------------------------------------------------------
-from graph import AgentState, create_crag_graph
+from lynx.graph import AgentState, create_crag_graph
 
 
 def test_agent_state_schema():
@@ -126,8 +126,8 @@ def test_langgraph_compilation_mocked():
     mock_client = MagicMock()
     mock_client.get_collection.return_value = MagicMock(vectors_count=7)
 
-    with patch("retriever.QdrantClient", return_value=mock_client):
-        with patch("retriever.TextEmbedding") as mock_embed:
+    with patch("lynx.retriever.QdrantClient", return_value=mock_client):
+        with patch("lynx.retriever.TextEmbedding") as mock_embed:
             mock_embed.return_value = MagicMock()
             graph = create_crag_graph()
             assert graph is not None
@@ -143,7 +143,7 @@ def test_langgraph_compilation_mocked():
 # ---------------------------------------------------------------------------
 # 5. Observability Graceful Fallback
 # ---------------------------------------------------------------------------
-from observability import setup_observability, trace_agent_node
+from lynx.observability import setup_observability, trace_agent_node
 
 
 def test_observability_graceful_fallback():
@@ -165,7 +165,7 @@ def test_trace_agent_node_context_manager():
 # ---------------------------------------------------------------------------
 def test_fastapi_route_registration():
     """Verify all critical API routes are registered without starting the server."""
-    from app import app
+    from lynx.app import app
     routes = [route.path for route in app.routes]
     assert "/query" in routes
     assert "/stream_query" in routes
@@ -173,3 +173,4 @@ def test_fastapi_route_registration():
     assert "/stats" in routes
     assert "/health" in routes
     assert "/auth/token" in routes
+

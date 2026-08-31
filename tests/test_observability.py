@@ -21,7 +21,7 @@ from fastapi.testclient import TestClient
 from qdrant_client import QdrantClient
 
 # Observability and Core Pipeline Imports
-from observability import (
+from lynx.observability import (
     setup_observability,
     get_tracer,
     get_current_trace_id,
@@ -30,10 +30,10 @@ from observability import (
     PHOENIX_PROJECT_NAME,
     PHOENIX_UI_URL,
 )
-from graph import create_crag_graph
-from app import app, service_state
-from retriever import HybridRetriever
-from ingest import IngestionPipeline, IngestionConfig
+from lynx.graph import create_crag_graph
+from lynx.app import app, service_state
+from lynx.retriever import HybridRetriever
+from lynx.ingest import IngestionPipeline, IngestionConfig
 
 
 def run_observability_tests():
@@ -136,3 +136,4 @@ def run_observability_tests():
 
 if __name__ == "__main__":
     run_observability_tests()
+

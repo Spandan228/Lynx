@@ -33,12 +33,15 @@ def test_graph_web_fallback():
     print(f"\n{CYAN}{BOLD}[1/2] TESTING LANGGRAPH AUTOMATED WEB SEARCH FALLBACK PATHWAY{RESET}")
     print("Testing with external query not indexed in local documents...")
 
-    client = QdrantClient(path="./qdrant_storage")
-    retriever = HybridRetriever(
-        qdrant_path="./qdrant_storage",
-        collection_name="agentic_rag_knowledge",
-        client=client,
-    )
+    import tempfile, shutil
+    temp_dir = tempfile.mkdtemp(prefix="test_qdrant_web_")
+    try:
+        client = QdrantClient(path=temp_dir)
+        retriever = HybridRetriever(
+            qdrant_path=temp_dir,
+            collection_name="agentic_rag_knowledge",
+            client=client,
+        )
     grader = DocumentGrader()
     engine = CRAGWorkflowEngine(
         retriever=retriever,
@@ -83,9 +86,11 @@ def test_graph_web_fallback():
     for c in final_state.get("citations", []):
         print(f"  * {c}")
 
-    assert final_state.get("web_search_executed") is True, "Web search fallback was not triggered!"
-    assert len(final_state.get("citations", [])) > 0, "No citations generated from web results!"
-    print(f"\n{GREEN}{BOLD}>>> LANGGRAPH WEB SEARCH FALLBACK VERIFIED SUCCESSFULLY <<<{RESET}")
+        assert final_state.get("web_search_executed") is True, "Web search fallback was not triggered!"
+        assert len(final_state.get("citations", [])) > 0, "No citations generated from web results!"
+        print(f"\n{GREEN}{BOLD}>>> LANGGRAPH WEB SEARCH FALLBACK VERIFIED SUCCESSFULLY <<<{RESET}")
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def test_fastapi_sse_streaming():

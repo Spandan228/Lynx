@@ -176,11 +176,8 @@ class HybridRetriever:
         self.sparse_weight = sparse_weight
         self.rrf_k = rrf_k
 
-        logger.info(f"Initializing FastEmbed model: '{embedding_model_name}' (threads=1 for memory efficiency)...")
-        try:
-            self.embedding_model = TextEmbedding(model_name=embedding_model_name, threads=1)
-        except TypeError:
-            self.embedding_model = TextEmbedding(model_name=embedding_model_name)
+        self.embedding_model_name = embedding_model_name
+        self._embedding_model: Optional[TextEmbedding] = None
 
         # Initialize Qdrant Client (reusing existing instance if provided)
         if client is not None:
@@ -193,6 +190,17 @@ class HybridRetriever:
 
         # Build initial BM25 index from stored Qdrant collection points
         self._build_bm25_index()
+
+    @property
+    def embedding_model(self) -> TextEmbedding:
+        """Lazy-loaded FastEmbed model instance."""
+        if self._embedding_model is None:
+            logger.info(f"Initializing FastEmbed model: '{self.embedding_model_name}' (threads=1 for memory efficiency)...")
+            try:
+                self._embedding_model = TextEmbedding(model_name=self.embedding_model_name, threads=1)
+            except TypeError:
+                self._embedding_model = TextEmbedding(model_name=self.embedding_model_name)
+        return self._embedding_model
 
     def _tokenize(self, text: str) -> List[str]:
         """Fast whitespace and alphanumeric tokenizer for BM25 with stopword removal."""

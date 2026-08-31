@@ -67,13 +67,8 @@ try:
 except ImportError:
     PdfReader = None
 
-# Optional Docling Document Converter
-try:
-    from docling.document_converter import DocumentConverter
-    DOCLING_AVAILABLE = True
-except ImportError:
-    DocumentConverter = None
-    DOCLING_AVAILABLE = False
+# Docling Document Converter flag (imported on-demand to save memory)
+DOCLING_AVAILABLE = True
 
 
 # ---------------------------------------------------------------------------
@@ -187,13 +182,13 @@ class DoclingDocumentLoader:
         """Lazy-loaded Docling DocumentConverter instance to conserve memory at startup."""
         if not self._docling_checked:
             self._docling_checked = True
-            if DOCLING_AVAILABLE and DocumentConverter is not None:
-                try:
-                    self._docling_converter = DocumentConverter()
-                    logger.info("Docling DocumentConverter initialized on-demand.")
-                except Exception as e:
-                    logger.warning(f"Could not initialize Docling DocumentConverter: {e}. Falling back to standard loaders.")
-                    self._docling_converter = None
+            try:
+                from docling.document_converter import DocumentConverter
+                self._docling_converter = DocumentConverter()
+                logger.info("Docling DocumentConverter initialized on-demand.")
+            except Exception as e:
+                logger.warning(f"Could not initialize Docling DocumentConverter: {e}. Falling back to standard loaders.")
+                self._docling_converter = None
         return self._docling_converter
 
     @staticmethod

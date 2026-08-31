@@ -36,6 +36,7 @@ FROM python:3.11-slim AS runtime
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH="/app/src" \
     HF_HOME="/app/.cache/huggingface" \
     FASTEMBED_CACHE_PATH="/app/.cache/fastembed"
 

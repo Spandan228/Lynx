@@ -42,49 +42,49 @@ def test_graph_web_fallback():
             collection_name="agentic_rag_knowledge",
             client=client,
         )
-    grader = DocumentGrader()
-    engine = CRAGWorkflowEngine(
-        retriever=retriever,
-        grader=grader,
-        web_search=web_search_client,
-        max_retrieval_retries=2,
-        max_generation_retries=2,
-    )
-    graph = create_crag_graph(engine)
+        grader = DocumentGrader()
+        engine = CRAGWorkflowEngine(
+            retriever=retriever,
+            grader=grader,
+            web_search=web_search_client,
+            max_retrieval_retries=2,
+            max_generation_retries=2,
+        )
+        graph = create_crag_graph(engine)
 
-    external_query = "What is the primary scientific objective of the James Webb Space Telescope?"
+        external_query = "What is the primary scientific objective of the James Webb Space Telescope?"
 
-    test_state: AgentState = {
-        "question": external_query,
-        "current_query": external_query,
-        "messages": [HumanMessage(content=external_query)],
-        "documents": [],
-        "generation": "",
-        "retrieval_retry_count": 0,
-        "generation_retry_count": 0,
-        "route_status": "init",
-        "web_search_needed": False,
-        "web_search_executed": False,
-        "hallucination_grade": None,
-        "hallucination_feedback": None,
-        "citations": [],
-    }
+        test_state: AgentState = {
+            "question": external_query,
+            "current_query": external_query,
+            "messages": [HumanMessage(content=external_query)],
+            "documents": [],
+            "generation": "",
+            "retrieval_retry_count": 0,
+            "generation_retry_count": 0,
+            "route_status": "init",
+            "web_search_needed": False,
+            "web_search_executed": False,
+            "hallucination_grade": None,
+            "hallucination_feedback": None,
+            "citations": [],
+        }
 
-    start_time = time.time()
-    final_state = graph.invoke(test_state)
-    elapsed = time.time() - start_time
+        start_time = time.time()
+        final_state = graph.invoke(test_state)
+        elapsed = time.time() - start_time
 
-    print(f"\n{BOLD}Execution Result Summary:{RESET}")
-    print(f"  - Web Search Executed : {GREEN if final_state.get('web_search_executed') else YELLOW}{final_state.get('web_search_executed')}{RESET}")
-    print(f"  - Retrieval Retries   : {final_state.get('retrieval_retry_count')}/2")
-    print(f"  - Total Citations     : {len(final_state.get('citations', []))}")
-    print(f"  - Grounding Grade     : {final_state.get('hallucination_grade')}")
-    print(f"  - Latency             : {elapsed:.2f}s")
-    print(f"\n{BOLD}Synthesized Answer Preview:{RESET}")
-    print(final_state.get("generation", "")[:350] + "...")
-    print(f"\n{BOLD}Citations Gathered:{RESET}")
-    for c in final_state.get("citations", []):
-        print(f"  * {c}")
+        print(f"\n{BOLD}Execution Result Summary:{RESET}")
+        print(f"  - Web Search Executed : {GREEN if final_state.get('web_search_executed') else YELLOW}{final_state.get('web_search_executed')}{RESET}")
+        print(f"  - Retrieval Retries   : {final_state.get('retrieval_retry_count')}/2")
+        print(f"  - Total Citations     : {len(final_state.get('citations', []))}")
+        print(f"  - Grounding Grade     : {final_state.get('hallucination_grade')}")
+        print(f"  - Latency             : {elapsed:.2f}s")
+        print(f"\n{BOLD}Synthesized Answer Preview:{RESET}")
+        print(final_state.get("generation", "")[:350] + "...")
+        print(f"\n{BOLD}Citations Gathered:{RESET}")
+        for c in final_state.get("citations", []):
+            print(f"  * {c}")
 
         assert final_state.get("web_search_executed") is True, "Web search fallback was not triggered!"
         assert len(final_state.get("citations", [])) > 0, "No citations generated from web results!"
